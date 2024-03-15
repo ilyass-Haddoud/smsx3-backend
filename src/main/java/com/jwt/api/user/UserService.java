@@ -2,6 +2,7 @@ package com.jwt.api.user;
 
 import com.jwt.api.role.Role;
 import com.jwt.api.role.RoleService;
+import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
 import com.jwt.api.utils.JwtUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +27,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final TwoFactorAuthenticationService twoFactorAuthenticationService;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleService roleService, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository, RoleService roleService, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, TwoFactorAuthenticationService twoFactorAuthenticationService) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
+        this.twoFactorAuthenticationService = twoFactorAuthenticationService;
     }
 
     public List<User> getUsers()
@@ -47,11 +50,17 @@ public class UserService {
         return this.userRepository.findById(id).orElseThrow(()-> new RuntimeException("user not found"));
     }
 
-    public ResponseEntity<String> login(String email, String password)
+    public ResponseEntity<String> login(String email, String password,String otpCode)
     {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
             User authenticatedUser = this.userRepository.getUserByEmail(email);
+            String secret = authenticatedUser.getSecret();
+            boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
+            if (!isOtpValid)
+            {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid OTP code");
+            }
             List<String> roles = new ArrayList<>();
             this.getUserById(authenticatedUser.getId()).getRoles().forEach(role -> {
                 roles.add(role.getAuthority());
@@ -69,6 +78,7 @@ public class UserService {
     {
         String encodedPassword = this.passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        user.setSecret(this.twoFactorAuthenticationService.generateNewSecret());
         return this.userRepository.save(user);
     }
 
