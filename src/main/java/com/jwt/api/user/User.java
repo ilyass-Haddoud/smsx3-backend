@@ -18,6 +18,8 @@ public class User{
     private String email;
 
     private String password;
+    private boolean mfaEnabled = true;
+    private String secret;
 
     @ManyToMany
     @JoinTable(name = "user_role",
@@ -65,5 +67,21 @@ public class User{
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public boolean isMfaEnabled() {
+        return mfaEnabled;
+    }
+
+    public void setMfaEnabled(boolean mfaEnabled) {
+        this.mfaEnabled = mfaEnabled;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }
