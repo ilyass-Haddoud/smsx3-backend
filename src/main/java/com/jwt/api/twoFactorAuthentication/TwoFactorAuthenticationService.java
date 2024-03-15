@@ -6,9 +6,12 @@ import dev.samstevens.totp.qr.QrData;
 import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.time.NtpTimeProvider;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
 import org.springframework.stereotype.Service;
+
+import java.net.UnknownHostException;
 
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
@@ -39,8 +42,8 @@ public class TwoFactorAuthenticationService {
         return getDataUriForImage(imageData, generator.getImageMimeType());
     }
 
-    public boolean isOtpValid(String secret, String code) {
-        TimeProvider timeProvider = new SystemTimeProvider();
+    public boolean isOtpValid(String secret, String code) throws UnknownHostException {
+        TimeProvider timeProvider = new NtpTimeProvider("pool.ntp.org", 5000);
         CodeGenerator codeGenerator = new DefaultCodeGenerator();
         CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
         return verifier.isValidCode(secret, code);
