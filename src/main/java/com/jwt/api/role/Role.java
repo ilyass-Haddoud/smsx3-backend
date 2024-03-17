@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "role_table")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

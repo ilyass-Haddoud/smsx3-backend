@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "user_table")
 public class User{
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -22,7 +23,7 @@ public class User{
     private String secret;
 
     @ManyToMany
-    @JoinTable(name = "user_role",
+    @JoinTable(name = "user_role_table",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
