@@ -5,6 +5,7 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -34,8 +35,7 @@ public class JwtUtil {
         claims.put("name",user.getName());
         claims.put("email",user.getEmail());
         claims.put("roles",roles);
-        Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
+        Date tokenValidity = new Date(System.currentTimeMillis() + accessTokenValidity);
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(tokenValidity)
@@ -78,7 +78,7 @@ public class JwtUtil {
         try {
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-            throw e;
+            throw new SessionAuthenticationException("Token expired, please reconnect");
         }
     }
 
