@@ -13,11 +13,12 @@ public class User{
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String email;
-
+    @Column(nullable = false)
     private String password;
     private boolean mfaEnabled = true;
     private String secret;
