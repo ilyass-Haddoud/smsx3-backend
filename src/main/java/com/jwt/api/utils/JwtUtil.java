@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtUtil {
@@ -89,6 +88,4 @@ public class JwtUtil {
     private List<String> getRoles(Claims claims) {
         return (List<String>) claims.get("roles");
     }
-
-
 }

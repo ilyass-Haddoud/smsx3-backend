@@ -22,6 +22,7 @@ public class authController {
         this.twoFactorAuthenticationService = twoFactorAuthenticationService;
     }
 
+    @CrossOrigin
     @PostMapping("login")
     public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO,@RequestParam String otpCode)
     {

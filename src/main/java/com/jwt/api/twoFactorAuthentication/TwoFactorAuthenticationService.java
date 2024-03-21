@@ -43,9 +43,8 @@ public class TwoFactorAuthenticationService {
     }
 
     public boolean isOtpValid(String secret, String code) throws UnknownHostException {
-        TimeProvider timeProvider = new NtpTimeProvider("pool.ntp.org", 5000);
         CodeGenerator codeGenerator = new DefaultCodeGenerator();
-        CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
+        CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, new SystemTimeProvider());
         return verifier.isValidCode(secret, code);
     }
 }
