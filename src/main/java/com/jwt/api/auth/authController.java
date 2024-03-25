@@ -1,5 +1,7 @@
 package com.jwt.api.auth;
 
+import com.jwt.api.supplier.Supplier;
+import com.jwt.api.supplier.SupplierService;
 import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
 import com.jwt.api.user.User;
 import com.jwt.api.user.UserLoginDTO;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class authController {
     private final UserService userService;
+    private final SupplierService supplierService;
     private final TwoFactorAuthenticationService twoFactorAuthenticationService;
 
     @Autowired
-    public authController(UserService userService, TwoFactorAuthenticationService twoFactorAuthenticationService) {
+    public authController(UserService userService, SupplierService supplierService, TwoFactorAuthenticationService twoFactorAuthenticationService) {
         this.userService = userService;
+        this.supplierService = supplierService;
         this.twoFactorAuthenticationService = twoFactorAuthenticationService;
     }
 
@@ -28,11 +32,20 @@ public class authController {
     {
         return this.userService.login(userLoginDTO.getEmail(),userLoginDTO.getPassword(),otpCode);
     }
-    @PostMapping("register")
+    @PostMapping("user/register")
     public ResponseEntity<String> register(@RequestBody User user)
     {
         User registredUser =  this.userService.register(user);
         return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredUser.getSecret()));
 
+    }
+
+    @CrossOrigin
+    @PostMapping("supplier/register")
+    public ResponseEntity<String> registerSupplier(@RequestBody Supplier supplier)
+    {
+        //Supplier registredSupplier =  this.supplierService.register(supplier);
+        //return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredSupplier.getSecret()));
+        return ResponseEntity.ok(supplier.toString());
     }
 }

@@ -2,6 +2,7 @@ package com.jwt.api.role;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jwt.api.supplier.Supplier;
 import com.jwt.api.user.User;
 import jakarta.persistence.*;
 
@@ -20,6 +21,10 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @JsonIgnoreProperties("roles")
     private List<User> users;
+
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnoreProperties("roles")
+    private List<Supplier> suppliers;
 
     public List<User> getUsers() {
         return users;
@@ -43,5 +48,13 @@ public class Role {
 
     public void setAuthority(String authority) {
         this.authority = authority;
+    }
+
+    public List<Supplier> getSuppliers() {
+        return suppliers;
+    }
+
+    public void setSuppliers(List<Supplier> suppliers) {
+        this.suppliers = suppliers;
     }
 }

@@ -1,0 +1,87 @@
+package com.jwt.api.supplier;
+
+import com.jwt.api.role.Role;
+import com.jwt.api.role.RoleService;
+import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
+import com.jwt.api.utils.JwtUtil;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class SupplierService {
+    private final SupplierRepository supplierRepository;
+    private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final TwoFactorAuthenticationService twoFactorAuthenticationService;
+
+
+    @Autowired
+    public SupplierService(SupplierRepository supplierRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, TwoFactorAuthenticationService twoFactorAuthenticationService) {
+        this.supplierRepository = supplierRepository;
+        this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+        this.twoFactorAuthenticationService = twoFactorAuthenticationService;
+    }
+
+    public List<Supplier> getSuppliers()
+    {
+        return this.supplierRepository.findAll();
+    }
+
+    public Supplier getSupplierById(Integer id) {
+        return this.supplierRepository.findById(id).orElseThrow(()-> new RuntimeException("supplier not found"));
+    }
+
+    public ResponseEntity<String> login(String email, String password,String otpCode)
+    {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
+            Supplier authenticatedUser = this.supplierRepository.getSupplierByEmail(email);
+            String secret = authenticatedUser.getSecret();
+            boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
+            if (!isOtpValid)
+            {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid OTP code");
+            }
+            List<String> roles = new ArrayList<>();
+            this.getSupplierById(authenticatedUser.getId()).getRoles().forEach(role -> {
+                roles.add(role.getAuthority());
+            });
+            String token = this.jwtUtil.createToken(authenticatedUser,roles);
+            return ResponseEntity.ok().body(token);
+        }catch (BadCredentialsException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid username or password");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    public Supplier register(Supplier supplier)
+    {
+        String encodedPassword = this.passwordEncoder.encode(supplier.getPassword());
+        supplier.setPassword(encodedPassword);
+        supplier.setSecret(this.twoFactorAuthenticationService.generateNewSecret());
+        return this.supplierRepository.save(supplier);
+    }
+
+
+    public Supplier convertToSupplier(SupplierLoginDTO supplierLoginDTO)
+    {
+        return this.modelMapper.map(supplierLoginDTO, Supplier.class);
+    }
+}

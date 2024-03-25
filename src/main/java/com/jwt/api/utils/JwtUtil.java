@@ -1,5 +1,6 @@
 package com.jwt.api.utils;
 
+import com.jwt.api.supplier.Supplier;
 import com.jwt.api.user.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +30,30 @@ public class JwtUtil {
         this.accessTokenValidity = accessTokenValidity;
     }
 
-    public String createToken(User user,List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(user.getEmail());
-        claims.put("name",user.getName());
-        claims.put("email",user.getEmail());
-        claims.put("roles",roles);
+    public String createToken(Object entity,List<String> roles) {
+        Claims claims = Jwts.claims();
+        String subject = null;
+        String email = null;
+        String bpsnum = null;
+
+        if (entity instanceof User user) {
+            subject = user.getEmail();
+            email = user.getEmail();
+            claims.put("name", user.getName());
+        } else if (entity instanceof Supplier supplier) {
+            subject = supplier.getBpsnum();
+            email = supplier.getBpsaddeml();
+            bpsnum = supplier.getBpsnum();
+            claims.put("name", bpsnum);
+        }
+
+        claims.setSubject(subject);
+
+        claims.put("email", email);
+        claims.put("roles", roles);
+
         Date tokenValidity = new Date(System.currentTimeMillis() + accessTokenValidity);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(tokenValidity)

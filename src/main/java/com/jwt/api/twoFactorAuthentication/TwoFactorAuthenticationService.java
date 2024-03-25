@@ -7,6 +7,7 @@ import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.time.NtpTimeProvider;
+import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
 import org.springframework.stereotype.Service;
 
@@ -42,9 +43,8 @@ public class TwoFactorAuthenticationService {
     }
 
     public boolean isOtpValid(String secret, String code) throws UnknownHostException {
-        TimeProvider timeProvider = new NtpTimeProvider("pool.ntp.org", 5000);
         CodeGenerator codeGenerator = new DefaultCodeGenerator();
-        CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
+        CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, new SystemTimeProvider());
         return verifier.isValidCode(secret, code);
     }
 }
