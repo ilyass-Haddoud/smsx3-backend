@@ -44,8 +44,7 @@ public class authController {
     @PostMapping("supplier/register")
     public ResponseEntity<String> registerSupplier(@RequestBody Supplier supplier)
     {
-        //Supplier registredSupplier =  this.supplierService.register(supplier);
-        //return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredSupplier.getSecret()));
-        return ResponseEntity.ok(supplier.toString());
+        Supplier registredSupplier =  this.supplierService.register(supplier);
+        return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredSupplier.getSecret()));
     }
 }

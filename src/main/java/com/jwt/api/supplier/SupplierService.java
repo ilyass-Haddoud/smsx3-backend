@@ -51,7 +51,7 @@ public class SupplierService {
     {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
-            Supplier authenticatedUser = this.supplierRepository.getSupplierByEmail(email);
+            Supplier authenticatedUser = this.supplierRepository.getSupplierByBpsaddeml(email);
             String secret = authenticatedUser.getSecret();
             boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
             if (!isOtpValid)
@@ -73,8 +73,8 @@ public class SupplierService {
 
     public Supplier register(Supplier supplier)
     {
-        String encodedPassword = this.passwordEncoder.encode(supplier.getPassword());
-        supplier.setPassword(encodedPassword);
+        String encodedPassword = this.passwordEncoder.encode(supplier.getBpspasse());
+        supplier.setBpspasse(encodedPassword);
         supplier.setSecret(this.twoFactorAuthenticationService.generateNewSecret());
         return this.supplierRepository.save(supplier);
     }

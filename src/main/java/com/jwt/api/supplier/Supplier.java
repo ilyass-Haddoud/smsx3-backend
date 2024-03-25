@@ -47,10 +47,10 @@ public class Supplier {
     @Column(name = "bpsnumtel")
     private String bpsnumtel;
 
-    @Column(name = "bpsaddeml")
+    @Column(name = "bpsaddeml",unique = true,nullable = false)
     private String bpsaddeml;
 
-    @Column(name = "bpspasse")
+    @Column(name = "bpspasse",nullable = false)
     private String bpspasse;
 
     @Column(name = "bpstyp")
@@ -62,11 +62,6 @@ public class Supplier {
     @Column(name = "bpslname")
     private String bpslname;
 
-    @Column(unique = true,nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
 
     private boolean mfaEnabled = true;
     private String secret;
@@ -239,19 +234,30 @@ public class Supplier {
         this.roles = roles;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public String toString() {
+        return "Supplier{" +
+                "id=" + id +
+                ", bpsnum='" + bpsnum + '\'' +
+                ", bpsnam='" + bpsnam + '\'' +
+                ", bpainv='" + bpainv + '\'' +
+                ", bpaadd='" + bpaadd + '\'' +
+                ", bpsrem='" + bpsrem + '\'' +
+                ", bpsgru='" + bpsgru + '\'' +
+                ", bpsrsk='" + bpsrsk + '\'' +
+                ", bsgcod='" + bsgcod + '\'' +
+                ", bptnum='" + bptnum + '\'' +
+                ", bpsnumbps='" + bpsnumbps + '\'' +
+                ", bpsnumtel='" + bpsnumtel + '\'' +
+                ", bpsaddeml='" + bpsaddeml + '\'' +
+                ", bpspasse='" + bpspasse + '\'' +
+                ", bpstyp='" + bpstyp + '\'' +
+                ", bpsfname='" + bpsfname + '\'' +
+                ", bpslname='" + bpslname + '\'' +
+                ", mfaEnabled=" + mfaEnabled +
+                ", secret='" + secret + '\'' +
+                ", roles=" + roles +
+                '}';
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
