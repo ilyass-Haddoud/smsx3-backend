@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 interface SupplierRepository extends JpaRepository<Supplier,Integer> {
-    Supplier getSupplierByBpsaddeml(String email);
+    Supplier getSupplierByBpsaddeml(String bpsaddeml);
 }

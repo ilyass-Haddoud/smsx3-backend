@@ -9,24 +9,31 @@ public class SupplierLoginDTO {
     @NotBlank(message = "email field cant be blank")
     @NotNull(message = "email field cant be null")
     @Email(message = "Not a valid email address")
-    private String email;
+    private String bpsaddeml;
     @NotBlank(message = "password field cant be blank")
     @NotNull(message = "password field cant be null")
-    private String password;
+    private String bpspasse;
 
-    public String getEmail() {
-        return email;
+    public String getBpsaddeml() {
+        return bpsaddeml;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setBpsaddeml(String bpsaddeml) {
+        this.bpsaddeml = bpsaddeml;
     }
 
-    public String getPassword() {
-        return password;
+    public String getBpspasse() {
+        return bpspasse;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setBpspasse(String bpspasse) {
+        this.bpspasse = bpspasse;
+    }
+    @Override
+    public String toString() {
+        return "SupplierLoginDTO{" +
+                "bpsaddeml='" + bpsaddeml + '\'' +
+                ", bpspasse='" + bpspasse + '\'' +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
 package com.jwt.api.auth;
 
 import com.jwt.api.supplier.Supplier;
+import com.jwt.api.supplier.SupplierLoginDTO;
 import com.jwt.api.supplier.SupplierService;
 import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
 import com.jwt.api.user.User;
@@ -41,9 +42,17 @@ public class authController {
     }
 
     @CrossOrigin
+    @PostMapping("supplier/login")
+    public ResponseEntity<String> loginSupplier(@Valid @RequestBody SupplierLoginDTO supplierLoginDTO, @RequestParam String otpCode)
+    {
+        return this.supplierService.login(supplierLoginDTO.getBpsaddeml(),supplierLoginDTO.getBpspasse(),otpCode);
+    }
+
+    @CrossOrigin
     @PostMapping("supplier/register")
     public ResponseEntity<String> registerSupplier(@RequestBody Supplier supplier)
     {
+        System.out.println(supplier.toString());
         Supplier registredSupplier =  this.supplierService.register(supplier);
         return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredSupplier.getSecret()));
     }

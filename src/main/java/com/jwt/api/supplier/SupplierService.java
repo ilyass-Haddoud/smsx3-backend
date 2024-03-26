@@ -47,11 +47,11 @@ public class SupplierService {
         return this.supplierRepository.findById(id).orElseThrow(()-> new RuntimeException("supplier not found"));
     }
 
-    public ResponseEntity<String> login(String email, String password,String otpCode)
+    public ResponseEntity<String> login(String bpsaddeml, String bpspasse,String otpCode)
     {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
-            Supplier authenticatedUser = this.supplierRepository.getSupplierByBpsaddeml(email);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(bpsaddeml,bpspasse));
+            Supplier authenticatedUser = this.supplierRepository.getSupplierByBpsaddeml(bpsaddeml);
             String secret = authenticatedUser.getSecret();
             boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
             if (!isOtpValid)
