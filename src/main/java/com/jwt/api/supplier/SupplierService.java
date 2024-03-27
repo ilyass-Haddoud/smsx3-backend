@@ -3,9 +3,11 @@ package com.jwt.api.supplier;
 import com.jwt.api.role.Role;
 import com.jwt.api.role.RoleService;
 import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
+import com.jwt.api.user.UserRepository;
 import com.jwt.api.utils.JwtUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,7 @@ import java.util.List;
 @Service
 public class SupplierService {
     private final SupplierRepository supplierRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -29,8 +32,9 @@ public class SupplierService {
 
 
     @Autowired
-    public SupplierService(SupplierRepository supplierRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, TwoFactorAuthenticationService twoFactorAuthenticationService) {
+    public SupplierService(SupplierRepository supplierRepository, UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, TwoFactorAuthenticationService twoFactorAuthenticationService) {
         this.supplierRepository = supplierRepository;
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -56,7 +60,7 @@ public class SupplierService {
             boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
             if (!isOtpValid)
             {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid OTP code");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid supplier OTP code");
             }
             List<String> roles = new ArrayList<>();
             this.getSupplierById(authenticatedUser.getId()).getRoles().forEach(role -> {
@@ -65,7 +69,7 @@ public class SupplierService {
             String token = this.jwtUtil.createToken(authenticatedUser,roles);
             return ResponseEntity.ok().body(token);
         }catch (BadCredentialsException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid username or password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid suppliername or password");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -73,6 +77,8 @@ public class SupplierService {
 
     public Supplier register(Supplier supplier)
     {
+        String email = supplier.getBpsaddeml();
+        if(userRepository.getUserByEmail(email) != null) throw new DataIntegrityViolationException("duplicate");
         String encodedPassword = this.passwordEncoder.encode(supplier.getBpspasse());
         supplier.setBpspasse(encodedPassword);
         supplier.setSecret(this.twoFactorAuthenticationService.generateNewSecret());

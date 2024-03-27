@@ -1,6 +1,5 @@
 package com.jwt.api.supplier;
 
-import com.jwt.api.user.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,16 +12,16 @@ import java.util.List;
 public class ImpSupplierDetailsService implements UserDetailsService {
     private final SupplierRepository supplierRepository;
 
-    public ImpSupplierDetailsService( SupplierRepository supplierRepository) {
+    public ImpSupplierDetailsService(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Supplier supplier = supplierRepository.getSupplierByBpsaddeml(username);
-        if(supplier == null) throw new UsernameNotFoundException("Invalid username or password");
+        if(supplier == null) throw new UsernameNotFoundException("Invalid suppliername or password");
         List<String> roles = new ArrayList<>();
-        roles.add("USER");
+        roles.add("SUPPLIER");
         return org.springframework.security.core.userdetails.User.builder()
                 .username(supplier.getBpsaddeml())
                 .password(supplier.getBpspasse())

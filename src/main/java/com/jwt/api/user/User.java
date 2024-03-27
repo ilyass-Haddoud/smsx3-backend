@@ -86,4 +86,16 @@ public class User{
     public void setSecret(String secret) {
         this.secret = secret;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", mfaEnabled=" + mfaEnabled +
+                ", secret='" + secret + '\'' +
+                '}';
+    }
 }
