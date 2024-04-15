@@ -1,5 +1,6 @@
 package com.jwt.api.supplier;
 
+import com.jwt.api.claim.Claim;
 import com.jwt.api.role.Role;
 import com.jwt.api.role.RoleService;
 import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;

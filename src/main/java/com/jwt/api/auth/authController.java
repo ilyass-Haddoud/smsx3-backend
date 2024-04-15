@@ -33,7 +33,7 @@ public class authController {
     {
         return this.userService.login(userLoginDTO.getEmail(),userLoginDTO.getPassword(),otpCode);
     }
-    @PostMapping("user/register")
+    @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody User user)
     {
         User registredUser =  this.userService.register(user);

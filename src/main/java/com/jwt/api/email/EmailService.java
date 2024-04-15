@@ -25,7 +25,7 @@ public class EmailService {
             MimeMessageHelper mailer = new MimeMessageHelper(message);
 
             mailer.setFrom(emailSender,"Sage Supplier Portal");
-            mailer.setTo(emailDetails.getRecipient());
+            mailer.setTo("maroua.assaadi02@gmail.com");
             mailer.setText(emailDetails.getMessageBody());
             mailer.setSubject(emailDetails.getSubject());
 

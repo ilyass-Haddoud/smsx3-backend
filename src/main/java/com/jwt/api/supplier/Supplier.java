@@ -1,6 +1,8 @@
 package com.jwt.api.supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jwt.api.claim.Claim;
+import com.jwt.api.invoice.Invoice;
 import com.jwt.api.role.Role;
 import jakarta.persistence.*;
 
@@ -66,6 +68,14 @@ public class Supplier {
     private boolean mfaEnabled = true;
     private String secret;
 
+    public List<Claim> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<Claim> claims) {
+        this.claims = claims;
+    }
+
     @ManyToMany
     @JoinTable(name = "supplier_role_table",
             joinColumns = @JoinColumn(name = "supplier_id"),
@@ -73,6 +83,22 @@ public class Supplier {
     )
     @JsonIgnoreProperties("suppliers")
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "supplier")
+    @JsonIgnoreProperties("supplier")
+    private List<Claim> claims;
+
+    @OneToMany(mappedBy = "supplier")
+    @JsonIgnoreProperties("supplier")
+    private List<Invoice> invoices;
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
+    }
 
     public Integer getId() {
         return id;
