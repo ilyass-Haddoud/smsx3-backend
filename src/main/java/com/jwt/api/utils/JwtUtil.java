@@ -35,21 +35,25 @@ public class JwtUtil {
         String subject = null;
         String email = null;
         String bpsnum = null;
+        Integer id = null;
 
         if (entity instanceof User user) {
             subject = user.getEmail();
             email = user.getEmail();
+            id = user.getId();
             claims.put("name", user.getName());
         } else if (entity instanceof Supplier supplier) {
             subject = supplier.getBpsnum();
             email = supplier.getBpsaddeml();
             bpsnum = supplier.getBpsnum();
+            id = supplier.getId();
             claims.put("name", bpsnum);
         }
 
         claims.setSubject(subject);
 
         claims.put("email", email);
+        claims.put("id", id);
         claims.put("roles", roles);
 
         Date tokenValidity = new Date(System.currentTimeMillis() + accessTokenValidity);

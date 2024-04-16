@@ -14,6 +14,7 @@ public class ClaimController {
         this.claimService = claimService;
     }
 
+    @CrossOrigin
     @PostMapping("{supplier_id}/addClaim")
     public ResponseEntity<String> addClaim(@PathVariable Integer supplier_id, @RequestBody Claim claim)
     {

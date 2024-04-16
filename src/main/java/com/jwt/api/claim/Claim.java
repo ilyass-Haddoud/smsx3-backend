@@ -18,9 +18,20 @@ public class Claim {
         this.entete = entete;
         this.message = message;
         this.supplier = supplier;
+        this.etat = "En attente";
     }
 
     private String message;
+
+    private String etat;
+
+    public String getEtat() {
+        return etat;
+    }
+
+    public void setEtat(String etat) {
+        this.etat = etat;
+    }
 
     public Claim() {}
 
