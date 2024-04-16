@@ -1,10 +1,11 @@
 package com.jwt.api.claim;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jwt.api.supplier.Supplier;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 public class Claim {
@@ -35,19 +36,20 @@ public class Claim {
 
     public Claim() {}
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supplier_id")
+    @JsonIgnoreProperties("supplier")
     private Supplier supplier;
 
     public Supplier getSupplier() {

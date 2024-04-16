@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("claims")
 public class ClaimController {
@@ -12,6 +14,13 @@ public class ClaimController {
     @Autowired
     public ClaimController(ClaimService claimService) {
         this.claimService = claimService;
+    }
+
+    @CrossOrigin
+    @RequestMapping("{supplier_id}/getClaims")
+    public List<Claim> getClaims(@PathVariable("supplier_id") Integer supplier_id)
+    {
+        return this.claimService.getSupplierClaims(supplier_id);
     }
 
     @CrossOrigin
