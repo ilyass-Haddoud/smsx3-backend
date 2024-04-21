@@ -15,10 +15,10 @@ public class InvoiceController {
         this.invoiceService = invoiceService;
     }
 
-    @PostMapping
-    public Invoice addInvoice(@RequestBody Invoice invoice)
+    @PostMapping("{supplier_id}/addInvoice")
+    public Invoice addInvoice(@PathVariable Integer supplier_id,@RequestBody Invoice invoice)
     {
-        return this.invoiceService.createInvoice(invoice);
+        return this.invoiceService.createInvoice(supplier_id,invoice);
     }
 
     @GetMapping("/{supplier_id}")

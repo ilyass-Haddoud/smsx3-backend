@@ -30,7 +30,7 @@ public class Invoice {
     private Date dateFinPeriode;
     private String document;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     @JsonIgnoreProperties("invoices")
     private Supplier supplier;

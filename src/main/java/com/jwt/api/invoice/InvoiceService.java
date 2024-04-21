@@ -18,9 +18,16 @@ public class InvoiceService {
         this.supplierRepository = supplierRepository;
     }
 
-    public Invoice createInvoice(Invoice invoice)
+    public Invoice createInvoice(Integer supplier_id,Invoice invoice)
     {
-        return invoiceRepository.save(invoice);
+        try {
+            Supplier supplier = this.supplierRepository.findById(supplier_id).orElseThrow(()->new RuntimeException("Supplier not found"));
+            supplier.getInvoices().add(invoice);
+            invoice.setSupplier(supplier);
+            return this.invoiceRepository.save(invoice);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Invoice> getAllInvoices(Integer supplier_id)
