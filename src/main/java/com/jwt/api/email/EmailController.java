@@ -13,6 +13,7 @@ public class EmailController {
         this.emailService = emailService;
     }
 
+    @CrossOrigin
     @PostMapping("/send")
     public void SendMail(@RequestBody Email email)
     {
