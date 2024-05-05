@@ -29,10 +29,11 @@ public class ClaimService {
         try {
             Supplier supplier = this.supplierService.getSupplierById(supplier_id);
             Claim claim = new Claim(entete,message,supplier);
-            Email email = new Email();
-            email.setSubject(entete);
-            email.setMessageBody(message);
-            this.emailService.sendEmail(email);
+            System.out.println("claim added: "+claim);
+//            Email email = new Email();
+//            email.setSubject(entete);
+//            email.setMessageBody(message);
+//            this.emailService.sendEmail(email);
             claimRepository.save(claim);
             return ResponseEntity.status(HttpStatus.CREATED).body("success");
         }catch (Exception e) {
