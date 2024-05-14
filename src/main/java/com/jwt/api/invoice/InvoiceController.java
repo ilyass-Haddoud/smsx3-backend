@@ -2,6 +2,7 @@ package com.jwt.api.invoice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,5 +26,11 @@ public class InvoiceController {
     public List<Invoice> getAllInvoices(@PathVariable Integer supplier_id)
     {
         return this.invoiceService.getAllInvoices(supplier_id);
+    }
+
+    @CrossOrigin
+    @PostMapping("/call")
+    public Mono<String> callSoapService() {
+        return invoiceService.callSoapService();
     }
 }

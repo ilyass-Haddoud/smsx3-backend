@@ -84,11 +84,11 @@ public class Supplier {
     @JsonIgnoreProperties("suppliers")
     private List<Role> roles;
 
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "supplier",cascade = CascadeType.ALL)
     @JsonIgnoreProperties("supplier")
     private List<Claim> claims;
 
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "supplier",cascade = CascadeType.ALL)
     @JsonIgnoreProperties("supplier")
     private List<Invoice> invoices;
 
