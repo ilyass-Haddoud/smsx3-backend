@@ -54,17 +54,17 @@ public class UserService {
         return this.userRepository.findById(id).orElseThrow(()-> new RuntimeException("user not found"));
     }
 
-    public ResponseEntity<String> login(String email, String password,String otpCode)
+    public ResponseEntity<String> login(String email, String password)
     {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
             User authenticatedUser = this.userRepository.getUserByEmail(email);
-            String secret = authenticatedUser.getSecret();
-            boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
-            if (!isOtpValid)
-            {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid user OTP code");
-            }
+//            String secret = authenticatedUser.getSecret();
+//            boolean isOtpValid = twoFactorAuthenticationService.isOtpValid(secret, otpCode);
+//            if (!isOtpValid)
+//            {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid user OTP code");
+//            }
             List<String> roles = new ArrayList<>();
             this.getUserById(authenticatedUser.getId()).getRoles().forEach(role -> {
                 roles.add(role.getAuthority());
@@ -84,7 +84,10 @@ public class UserService {
         if(supplierRepository.getSupplierByBpsaddeml(email) != null) throw new DataIntegrityViolationException("duplicate");
         String encodedPassword = this.passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        user.setSecret(this.twoFactorAuthenticationService.generateNewSecret());
+        //user.setSecret(this.twoFactorAuthenticationService.generateNewSecret());
+        Role role = this.roleService.getRoleById(2);
+        user.getRoles().add(role);
+        user.setMfaEnabled(false);
         return this.userRepository.save(user);
     }
 

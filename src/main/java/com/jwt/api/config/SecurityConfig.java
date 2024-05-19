@@ -56,6 +56,8 @@ public class SecurityConfig  {
                         request->{
                             request.requestMatchers("/auth/**").permitAll();
                             request.requestMatchers("/mail/**").permitAll();
+                            request.requestMatchers("/suppliers/forgot_password").permitAll();
+                            request.requestMatchers("/suppliers/reset_password").permitAll();
                             request.requestMatchers("/invoices/call").permitAll();
                             request.requestMatchers("/error").permitAll();
                             request.requestMatchers("/favicon.ico").permitAll();

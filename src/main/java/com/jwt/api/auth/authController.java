@@ -7,6 +7,7 @@ import com.jwt.api.twoFactorAuthentication.TwoFactorAuthenticationService;
 import com.jwt.api.user.User;
 import com.jwt.api.user.UserLoginDTO;
 import com.jwt.api.user.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,15 +30,15 @@ public class authController {
 
     @CrossOrigin
     @PostMapping("login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO,@RequestParam String otpCode)
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO)
     {
-        return this.userService.login(userLoginDTO.getEmail(),userLoginDTO.getPassword(),otpCode);
+        return this.userService.login(userLoginDTO.getEmail(),userLoginDTO.getPassword());
     }
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody User user)
     {
         User registredUser =  this.userService.register(user);
-        return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredUser.getSecret()));
+        return ResponseEntity.status(200).body(registredUser.toString());
 
     }
 
@@ -50,8 +51,7 @@ public class authController {
 
     @CrossOrigin
     @PostMapping("supplier/register")
-    public ResponseEntity<String> registerSupplier(@RequestBody Supplier supplier)
-    {
+    public ResponseEntity<String> registerSupplier(@RequestBody Supplier supplier) throws MessagingException {
         System.out.println(supplier.toString());
         Supplier registredSupplier =  this.supplierService.register(supplier);
         return ResponseEntity.ok(this.twoFactorAuthenticationService.generateQrCodeImageUri(registredSupplier.getSecret()));

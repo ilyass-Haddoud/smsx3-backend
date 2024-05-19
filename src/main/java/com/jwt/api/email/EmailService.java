@@ -1,5 +1,6 @@
 package com.jwt.api.email;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,13 +20,13 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
 
-    public void sendEmail(Email emailDetails){
+    public void sendEmail(Email emailDetails) throws MessagingException {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper mailer = new MimeMessageHelper(message);
 
             mailer.setFrom(emailSender,"Sage Supplier Portal");
-            mailer.setTo("ilyass.haddoud@gmail.com");
+            mailer.setTo(emailDetails.getRecipient());
             mailer.setText(emailDetails.getMessageBody());
             mailer.setSubject(emailDetails.getSubject());
 

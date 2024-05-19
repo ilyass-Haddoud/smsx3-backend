@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jwt.api.role.Role;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class User{
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnoreProperties("users")
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<Role>();
 
     public Integer getId() {
         return id;

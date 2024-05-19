@@ -6,6 +6,7 @@ import com.jwt.api.invoice.Invoice;
 import com.jwt.api.role.Role;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,6 +16,8 @@ public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private boolean disactivated = true;
 
     @Column(name = "bpsnum", unique = true,nullable = false)
     private String bpsnum;
@@ -82,7 +85,7 @@ public class Supplier {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnoreProperties("suppliers")
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<Role>();
 
     @OneToMany(mappedBy = "supplier",cascade = CascadeType.ALL)
     @JsonIgnoreProperties("supplier")
@@ -286,4 +289,11 @@ public class Supplier {
                 '}';
     }
 
+    public boolean isDisactivated() {
+        return disactivated;
+    }
+
+    public void setDisactivated(boolean disactivated) {
+        this.disactivated = disactivated;
+    }
 }

@@ -1,5 +1,6 @@
 package com.jwt.api.email;
 
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +16,7 @@ public class EmailController {
 
     @CrossOrigin
     @PostMapping("/send")
-    public void SendMail(@RequestBody Email email)
-    {
+    public void SendMail(@RequestBody Email email) throws MessagingException {
         this.emailService.sendEmail(email);
     }
 }

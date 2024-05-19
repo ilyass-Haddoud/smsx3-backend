@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ListResourceBundle;
 
 @Service
 public class ClaimService {
@@ -22,6 +23,11 @@ public class ClaimService {
         this.claimRepository = claimRepository;
         this.supplierService = supplierService;
         this.emailService = emailService;
+    }
+
+    public List<Claim> getAllClaims()
+    {
+        return claimRepository.findAll();
     }
 
     public ResponseEntity<String> addClaim(String entete,String message,Integer supplier_id)
