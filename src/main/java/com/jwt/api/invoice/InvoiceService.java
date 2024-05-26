@@ -2,6 +2,8 @@ package com.jwt.api.invoice;
 
 import com.jwt.api.config.ApiClient;
 import com.jwt.api.config.SoapResponseParser;
+import com.jwt.api.item.Item;
+import com.jwt.api.item.ItemRepository;
 import com.jwt.api.supplier.Supplier;
 import com.jwt.api.supplier.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,28 +20,18 @@ public class InvoiceService {
     private final SupplierRepository supplierRepository;
     private final WebClient webClient;
     private final SoapResponseParser soapResponseParser;
+    private final ItemRepository itemRepository;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository, SupplierRepository supplierRepository, ApiClient apiClient, WebClient webClient, SoapResponseParser soapResponseParser) {
+    public InvoiceService(InvoiceRepository invoiceRepository, SupplierRepository supplierRepository, ApiClient apiClient, WebClient webClient, SoapResponseParser soapResponseParser, ItemRepository itemRepository) {
         this.invoiceRepository = invoiceRepository;
         this.supplierRepository = supplierRepository;
         this.webClient = webClient;
         this.soapResponseParser = soapResponseParser;
+        this.itemRepository = itemRepository;
     }
 
-    public Invoice createInvoice(Integer supplier_id,Invoice invoice)
-    {
-        try {
-            Supplier supplier = this.supplierRepository.findById(supplier_id).orElseThrow(()->new RuntimeException("Supplier not found"));
-            supplier.getInvoices().add(invoice);
-            invoice.setSupplier(supplier);
-            return this.invoiceRepository.save(invoice);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Invoice> getAllInvoices(Integer supplier_id)
+    public List<Invoice> getInvoicesBySupplier(Integer supplier_id)
     {
         try {
             Supplier supplier = this.supplierRepository.findById(supplier_id).orElseThrow(()->new RuntimeException("Supplier not found"));
@@ -48,6 +40,127 @@ public class InvoiceService {
             throw new RuntimeException(e);
         }
     }
+
+    public Invoice getInvoicesById(Integer id)
+    {
+        return this.invoiceRepository.findById(id).orElseThrow(()->new RuntimeException("Invoice not found"));
+    }
+
+    public List<Invoice> getAllInvoices()
+    {
+        return this.invoiceRepository.findAll();
+    }
+
+    public Invoice createInvoice(Integer supplierId, Invoice invoice) {
+        try {
+            Supplier supplier = this.supplierRepository.findById(supplierId)
+                    .orElseThrow(() -> new RuntimeException("Supplier not found"));
+            invoice.setSupplier(supplier);
+
+            // Set the invoice for each item before saving the invoice
+            if (invoice.getItems() != null) {
+                for (Item item : invoice.getItems()) {
+                    item.setInvoice(invoice);
+                }
+            }
+
+            // Save the invoice, which will cascade and save the items as well
+            return this.invoiceRepository.save(invoice);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Invoice updateInvoice(Integer invoiceId, Invoice updatedInvoice) {
+        Invoice existingInvoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        updateInvoiceFields(existingInvoice, updatedInvoice);
+        setInvoiceForItems(existingInvoice);
+
+        return invoiceRepository.save(existingInvoice);
+    }
+
+    private void updateInvoiceFields(Invoice existingInvoice, Invoice updatedInvoice) {
+        existingInvoice.setSite(updatedInvoice.getSite());
+        existingInvoice.setTypeFacture(updatedInvoice.getTypeFacture());
+        existingInvoice.setNumeroPiece(updatedInvoice.getNumeroPiece());
+        existingInvoice.setDateComptable(updatedInvoice.getDateComptable());
+        existingInvoice.setTiers(updatedInvoice.getTiers());
+        existingInvoice.setCollectif(updatedInvoice.getCollectif());
+        existingInvoice.setDevise(updatedInvoice.getDevise());
+        existingInvoice.setBonAPayer(updatedInvoice.getBonAPayer());
+        existingInvoice.setDocumentOrigine(updatedInvoice.getDocumentOrigine());
+        existingInvoice.setDateOrigine(updatedInvoice.getDateOrigine());
+        existingInvoice.setReferenceInterne(updatedInvoice.getReferenceInterne());
+        existingInvoice.setCommentaires0(updatedInvoice.getCommentaires0());
+        existingInvoice.setCommentaires1(updatedInvoice.getCommentaires1());
+        existingInvoice.setCommentaires2(updatedInvoice.getCommentaires2());
+        existingInvoice.setTotalHTLignes(updatedInvoice.getTotalHTLignes());
+        existingInvoice.setTotalTaxes(updatedInvoice.getTotalTaxes());
+        existingInvoice.setMontantTTC(updatedInvoice.getMontantTTC());
+        existingInvoice.setEtat(updatedInvoice.getEtat());
+        existingInvoice.setTexteEntete71(updatedInvoice.getTexteEntete71());
+        existingInvoice.setTexteEntete72(updatedInvoice.getTexteEntete72());
+        existingInvoice.setTextePied81(updatedInvoice.getTextePied81());
+        existingInvoice.setTextePied82(updatedInvoice.getTextePied82());
+        if (updatedInvoice.getItems() != null) {
+            existingInvoice.setItems(updatedInvoice.getItems());
+        }
+    }
+
+    private void setInvoiceForItems(Invoice invoice) {
+        if (invoice.getItems() != null) {
+            for (Item item : invoice.getItems()) {
+                item.setInvoice(invoice);
+            }
+        }
+    }
+
+    public Mono<List<String>> addInvoiceToSage(String iFileContent) {
+        System.out.println("inside add invoice to sage service");
+
+        String soapMessage = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.adonix.com/WSS\">\n" +
+                "  <soapenv:Header/>\n" +
+                "  <soapenv:Body>\n" +
+                "    <wss:run soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n" +
+                "      <callContext xsi:type=\"wss:CAdxCallContext\">\n" +
+                "        <codeLang xsi:type=\"xsd:string\">FRA</codeLang>\n" +
+                "        <poolAlias xsi:type=\"xsd:string\">FORMATION</poolAlias>\n" +
+                "        <poolId xsi:type=\"xsd:string\"></poolId>\n" +
+                "        <requestConfig xsi:type=\"xsd:string\">\n" +
+                "          <![CDATA[adxwss.optreturn=JSON&adxwss.beautify=true&adxwss.trace.on=off]]>\n" +
+                "        </requestConfig>\n" +
+                "      </callContext>\n" +
+                "      <publicName xsi:type=\"xsd:string\">AOWSIMPORT</publicName>\n" +
+                "      <inputXml xsi:type=\"xsd:string\">\n" +
+                "        <![CDATA[{\n" +
+                "          \"GRP1\": {\n" +
+                "            \"I_MODIMP\": \"PIH\",\n" +
+                "            \"I_AOWSTA\": \"NO\",\n" +
+                "            \"I_EXEC\": \"REALTIME\",\n" +
+                "            \"I_RECORDSEP\": \"|\",\n" +
+                "            \"I_FILE\":\"" + iFileContent + "\"\n" +
+                "          }\n" +
+                "        }]]>\n" +
+                "      </inputXml>\n" +
+                "    </wss:run>\n" +
+                "  </soapenv:Body>\n" +
+                "</soapenv:Envelope>";
+
+        return webClient.post()
+                .uri("")
+                .header("Authorization", basicAuthHeader())
+                .header("SOAPAction","SOAPAction")
+                .body(BodyInserters.fromValue(soapMessage))
+                .retrieve()
+                .bodyToMono(String.class)
+                .flatMap(responseXml -> {
+                    List<String> messages = soapResponseParser.extractAllMessages(responseXml);
+                    return Mono.just(messages);
+                });
+    }
+
 
     public Mono<String> callSoapService() {
         String soapMessage = " <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.adonix.com/WSS\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
@@ -66,12 +179,12 @@ public class InvoiceService {
                 "        <inputXml xsi:type=\"xsd:string\">\n" +
                 "        <![CDATA[{\n" +
                 "            \"GRP1\": {\n" +
-                "            \"I_MODEXP\": \"SUP\",\n" +
+                "            \"I_MODEXP\": \"PIH\",\n" +
                 "            \"I_CHRONO\": \"NO\"\n" +
                 "            },\n" +
                 "            \"GRP2\": [\n" +
                 "            {\n" +
-                "                \"I_TCRITERE\": \"BPR='AE020'\"\n" +
+                "                \"I_TCRITERE\": \"BPR='AE023'\"\n" +
                 "            }  \n" +
                 "            ],\n" +
                 "            \"GRP3\": {\n" +

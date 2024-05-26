@@ -10,6 +10,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class SoapResponseParser {
@@ -36,6 +38,27 @@ public class SoapResponseParser {
         }
         return null;
     }
+
+    public List<String> extractAllMessages(String responseXml) {
+        List<String> messages = new ArrayList<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            ByteArrayInputStream input = new ByteArrayInputStream(responseXml.getBytes());
+            Document doc = builder.parse(input);
+
+            NodeList messageList = doc.getElementsByTagName("message");
+            for (int i = 0; i < messageList.getLength(); i++) {
+                Element message = (Element) messageList.item(i);
+                String messageContent = message.getTextContent();
+                messages.add(messageContent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return messages;
+    }
+
 
     private String extractOFileFromJson(String jsonContent) {
         try {
