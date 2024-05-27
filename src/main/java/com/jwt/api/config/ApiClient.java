@@ -12,7 +12,7 @@ public class ApiClient {
     public WebClient webclient() {
         return WebClient
             .builder()
-            .baseUrl("http://192.168.88.157:8124/soap-generic/syracuse/collaboration/syracuse/CAdxWebServiceXmlCC")
+            .baseUrl("http://192.168.88.172:8124/soap-generic/syracuse/collaboration/syracuse/CAdxWebServiceXmlCC")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_XML_VALUE)
             .build();  }
 }

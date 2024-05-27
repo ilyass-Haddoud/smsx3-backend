@@ -58,7 +58,7 @@ public class SecurityConfig  {
                             request.requestMatchers("/mail/**").permitAll();
                             request.requestMatchers("/suppliers/forgot_password").permitAll();
                             request.requestMatchers("/suppliers/reset_password").permitAll();
-                            request.requestMatchers("/invoices/call").permitAll();
+                            request.requestMatchers("/invoices/call/**").permitAll();
                             request.requestMatchers("/invoices/sage/addInvoice").permitAll();
                             request.requestMatchers("/error").permitAll();
                             request.requestMatchers("/favicon.ico").permitAll();

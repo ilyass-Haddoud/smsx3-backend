@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("invoices")
@@ -54,7 +55,17 @@ public class InvoiceController {
     }
 
     @CrossOrigin
-    @PostMapping("sage/addInvoice")
+    @PutMapping("/syncStatus/{invoice_id}")
+    public Invoice syncStatus(@PathVariable Integer invoice_id,@RequestBody Map<String, Integer> status)
+    {
+        System.out.println("in syncStatus controller");
+        System.out.println(invoice_id);
+        System.out.println(status);
+        return this.invoiceService.updateInvoiceStatus(invoice_id, status.get("etat"));
+    }
+
+    @CrossOrigin
+    @PostMapping("/sage/addInvoice")
     public Mono<List<String>> addInvoice(@RequestBody String invoice)
     {
         System.out.println("inside add invoice to sage controller");
@@ -63,8 +74,8 @@ public class InvoiceController {
     }
 
     @CrossOrigin
-    @PostMapping("/call")
-    public Mono<String> callSoapService() {
-        return invoiceService.callSoapService();
+    @PostMapping("/call/{bpr}")
+    public Mono<String> callSoapService(@PathVariable String bpr) {
+        return invoiceService.callSoapService(bpr);
     }
 }

@@ -71,6 +71,17 @@ public class InvoiceService {
         }
     }
 
+    public Invoice updateInvoiceStatus(Integer invoice_id,Integer status)
+    {
+        System.out.println("in updateInvoiceStatus method");
+        System.out.println(invoice_id);
+        System.out.println(status);
+
+        Invoice existingInvoice = invoiceRepository.findById(invoice_id).orElseThrow(()->new RuntimeException("Invoice not found"));
+        existingInvoice.setEtat(status);
+        return this.invoiceRepository.save(existingInvoice);
+    }
+
     public Invoice updateInvoice(Integer invoiceId, Invoice updatedInvoice) {
         Invoice existingInvoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
@@ -162,7 +173,8 @@ public class InvoiceService {
     }
 
 
-    public Mono<String> callSoapService() {
+    public Mono<String> callSoapService(String bprValue) {
+        System.out.println("bpr: "+bprValue);
         String soapMessage = " <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.adonix.com/WSS\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
                 "    <soapenv:Header/>\n" +
                 "    <soapenv:Body>\n" +
@@ -184,7 +196,7 @@ public class InvoiceService {
                 "            },\n" +
                 "            \"GRP2\": [\n" +
                 "            {\n" +
-                "                \"I_TCRITERE\": \"BPR='AE023'\"\n" +
+                "                \"I_TCRITERE\": \"BPR='" + bprValue + "'\"\n" +
                 "            }  \n" +
                 "            ],\n" +
                 "            \"GRP3\": {\n" +
