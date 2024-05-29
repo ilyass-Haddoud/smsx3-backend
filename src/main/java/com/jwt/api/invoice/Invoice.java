@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jwt.api.item.Item;
 import com.jwt.api.supplier.Supplier;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -91,6 +92,13 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("invoice")
     private List<Item> items;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "document")
+    private String document;
 
     // Getters and setters for each field
 
@@ -292,5 +300,21 @@ public class Invoice {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
     }
 }

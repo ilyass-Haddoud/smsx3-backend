@@ -1,9 +1,16 @@
 package com.jwt.api.invoice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +26,9 @@ public class InvoiceController {
 
     @CrossOrigin
     @PostMapping("{supplier_id}/addInvoice")
-    public Invoice addInvoice(@PathVariable Integer supplier_id,@RequestBody Invoice invoice)
-    {
-        System.out.println("Adding invoice route called");
-        System.out.println(invoice.getBonAPayer());
-        return this.invoiceService.createInvoice(supplier_id,invoice);
+    public Invoice addInvoice(@PathVariable Integer supplier_id, @RequestParam("file") MultipartFile file, @RequestParam("invoice") String invoice) throws JsonProcessingException {
+        Invoice invoiceObj = new ObjectMapper().readValue(invoice, Invoice.class);
+        return this.invoiceService.createInvoice(supplier_id, file, invoiceObj);
     }
 
     @CrossOrigin
@@ -45,6 +50,19 @@ public class InvoiceController {
     public Invoice getInvoiceById(@PathVariable Integer id)
     {
         return this.invoiceService.getInvoicesById(id);
+    }
+
+    @CrossOrigin
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> downloadInvoice(@PathVariable String filename) throws IOException {
+        try{
+            Resource resource = invoiceService.loadInvoiceFile(filename);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.status(404).body(null);
+        }
     }
 
     @CrossOrigin

@@ -7,11 +7,20 @@ import com.jwt.api.item.ItemRepository;
 import com.jwt.api.supplier.Supplier;
 import com.jwt.api.supplier.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -51,11 +60,35 @@ public class InvoiceService {
         return this.invoiceRepository.findAll();
     }
 
-    public Invoice createInvoice(Integer supplierId, Invoice invoice) {
+    public Invoice createInvoice(Integer supplierId, MultipartFile file, Invoice invoice) {
         try {
             Supplier supplier = this.supplierRepository.findById(supplierId)
                     .orElseThrow(() -> new RuntimeException("Supplier not found"));
             invoice.setSupplier(supplier);
+
+            // Generate the filename
+            String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+            String newFilename = supplier.getBpsnum() + "_" + timestamp + fileExtension;
+            System.out.println(newFilename);
+
+            // Define the relative folder path
+            String folder = "storage/invoices";
+            Path folderPath = Paths.get(folder);
+
+            // Create the folder if it does not exist
+            if (!Files.exists(folderPath)) {
+                Files.createDirectories(folderPath);
+            }
+
+            // Resolve the file path
+            Path filePath = folderPath.resolve(newFilename);
+            Files.write(filePath, file.getBytes());
+
+            // Update the invoice document field with the new filename
+            invoice.setDocument(newFilename);
+
 
             // Set the invoice for each item before saving the invoice
             if (invoice.getItems() != null) {
@@ -68,6 +101,15 @@ public class InvoiceService {
             return this.invoiceRepository.save(invoice);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Resource loadInvoiceFile(String filename) throws IOException {
+        Path filePath = Paths.get("storage/invoices").resolve(filename).normalize();
+        if (Files.exists(filePath) && Files.isReadable(filePath)) {
+            return new UrlResource(filePath.toUri());
+        } else {
+            throw new IOException("File not found or not readable: " + filename);
         }
     }
 
