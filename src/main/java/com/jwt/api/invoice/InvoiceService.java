@@ -113,7 +113,7 @@ public class InvoiceService {
         }
     }
 
-    public Invoice updateInvoiceStatus(Integer invoice_id,Integer status)
+    public Invoice updateInvoiceStatus(Integer invoice_id,Integer status, String numeroPiece)
     {
         System.out.println("in updateInvoiceStatus method");
         System.out.println(invoice_id);
@@ -121,6 +121,7 @@ public class InvoiceService {
 
         Invoice existingInvoice = invoiceRepository.findById(invoice_id).orElseThrow(()->new RuntimeException("Invoice not found"));
         existingInvoice.setEtat(status);
+        existingInvoice.setNumeroPiece(numeroPiece);
         return this.invoiceRepository.save(existingInvoice);
     }
 

@@ -2,6 +2,7 @@ package com.jwt.api.invoice;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jwt.api.item.Item;
+import com.jwt.api.order.PurchaseOrder;
 import com.jwt.api.supplier.Supplier;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,6 +21,10 @@ public class Invoice {
     @JoinColumn(name = "supplier_id")
     @JsonIgnoreProperties("invoices")
     private Supplier supplier;
+
+    @OneToOne
+    @JoinColumn(name = "purchaseOrder_id")
+    private PurchaseOrder purchaseOrder;
 
     @Column(name = "site", nullable = false)
     private String site;

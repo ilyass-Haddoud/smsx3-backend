@@ -73,13 +73,13 @@ public class InvoiceController {
     }
 
     @CrossOrigin
-    @PutMapping("/syncStatus/{invoice_id}")
-    public Invoice syncStatus(@PathVariable Integer invoice_id,@RequestBody Map<String, Integer> status)
+    @PutMapping("/syncStatus/{invoice_id}/{numeroPiece}")
+    public Invoice syncStatus(@PathVariable Integer invoice_id, @PathVariable String numeroPiece, @RequestBody Map<String, Integer> status)
     {
         System.out.println("in syncStatus controller");
         System.out.println(invoice_id);
         System.out.println(status);
-        return this.invoiceService.updateInvoiceStatus(invoice_id, status.get("etat"));
+        return this.invoiceService.updateInvoiceStatus(invoice_id, status.get("etat"), numeroPiece);
     }
 
     @CrossOrigin
